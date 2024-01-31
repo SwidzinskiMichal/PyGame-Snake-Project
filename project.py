@@ -73,8 +73,10 @@ draw_grid()
 snake = Snake()
 opponents = [Opponent() for opponent in range(3)]
 wall = [Wall(tile * 50) for tile in range(16)]
-for i in range(3):
-    wall.pop(random.randint(0, len(wall) - 1))
+entrance_index = random.randint(1, len(wall) - 2)
+wall.pop(entrance_index)
+wall.pop(entrance_index)
+wall.pop(entrance_index - 1)
 
 while True:
     for event in pygame.event.get():
@@ -82,7 +84,21 @@ while True:
             print("Thanks for playing!")
             exit()
 
-    
+    if total_frames_count % 100 == 0:
+        for opponent in opponents:
+            opponent.y += 50
+            opponent.rect = pygame.Rect(opponent.x, opponent.y, TILE_SIZE, TILE_SIZE)
+            if opponent.y > 800:
+                opponents.remove(opponent)
+        for tile in wall:
+            tile.y += 50
+            tile.rect = pygame.Rect(tile.x, tile.y, TILE_SIZE, TILE_SIZE)
+            if tile.y > 800:
+                wall = [Wall(tile * 50) for tile in range(16)]
+                entrance_index = random.randint(1, len(wall) - 2)
+                wall.pop(entrance_index)
+                wall.pop(entrance_index)
+                wall.pop(entrance_index - 1)    
             
     # Snake size and positon
     snake.snake_movement(pygame.key.get_pressed())
@@ -108,32 +124,13 @@ while True:
             opponents.remove(opponent)
             if len(snake.body) < 5:
                 snake.body.append(pygame.Rect(snake.head.x, snake.head.y, TILE_SIZE, TILE_SIZE))
+        if wall[0].y == opponent.y:
+            opponents.remove(opponent)
 
     if len(opponents) < 3:
         opponents.append(Opponent())
 
 
-    if total_frames_count % 100 == 0:
-        for opponent in opponents:
-            opponent.y += 50
-            opponent.rect = pygame.Rect(opponent.x, opponent.y, TILE_SIZE, TILE_SIZE)
-            if opponent.y > 800:
-                opponents.remove(opponent)
-        for tile in wall:
-            tile.y += 50
-            tile.rect = pygame.Rect(tile.x, tile.y, TILE_SIZE, TILE_SIZE)
-            if tile.y > 800:
-                wall = [Wall(tile * 50) for tile in range(16)]
-                for i in range(3):
-                    wall.pop(random.randint(0, len(wall) - 1))
-
-    total_frames_count += 10
-
-
-    
-
-        
-        
-
+    total_frames_count += 4
     pygame.display.update()
-    clock.tick(10)
+    clock.tick(15)
