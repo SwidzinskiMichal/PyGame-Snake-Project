@@ -10,7 +10,7 @@ clock = pygame.time.Clock()
 
 class Snake:
     def __init__(self):
-        self.x, self.y = TILE_SIZE, TILE_SIZE
+        self.x, self.y = TILE_SIZE, WINDOW - 2 * TILE_SIZE
         self.horizontal_direction = 1
         self.vertical_direction = 0
         self.head = pygame.Rect(self.x, self.y, TILE_SIZE, TILE_SIZE)
@@ -43,7 +43,7 @@ class Snake:
 class Opponent:
     def __init__(self):
         self.x = int(random.randint(0, WINDOW) / TILE_SIZE) * TILE_SIZE
-        self.y = 0
+        self.y = -100
         self.rect = pygame.Rect(self.x, self.y, TILE_SIZE, TILE_SIZE)
 
     def draw_opponent(self):
@@ -111,6 +111,11 @@ while True:
     pygame.draw.rect(screen, "green", snake.head)
     for tile in snake.body:
         pygame.draw.rect(screen, "green", tile)
+
+    if snake.head.y > 800 or snake.head.y < 0 or snake.head.x > 800 or snake.head.x < 0:
+        snake.dead = True
+    if snake.head.y == wall[0].y:
+        snake.dead = True
 
     # Opponent position
     for opponent in opponents:
