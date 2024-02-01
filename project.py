@@ -18,6 +18,29 @@ class Snake:
         self.dead = False
 
     def update_position(self):
+        global opponents, wall
+        for tile in self.body:
+            if self.head.y == tile.y and self.head.x == tile.x:
+                self.dead = True
+        if self.head.y not in range(0, WINDOW) or self.head.x not in range(0, WINDOW):
+            self.dead = True
+
+            
+        if self.dead:
+            self.x, self.y = TILE_SIZE, WINDOW - 2 * TILE_SIZE
+            self.horizontal_direction = 1
+            self.vertical_direction = 0
+            self.head = pygame.Rect(self.x, self.y, TILE_SIZE, TILE_SIZE)
+            self.body = [pygame.Rect(self.x - TILE_SIZE, self.y, TILE_SIZE, TILE_SIZE)]
+            self.dead = False
+            opponents = [Opponent() for opponent in range(3)]
+            wall = [Wall(tile * 50) for tile in range(16)]
+            entrance_index = random.randint(1, len(wall) - 2)
+            wall.pop(entrance_index)
+            wall.pop(entrance_index)
+            wall.pop(entrance_index - 1)
+
+
         self.body.append(self.head)
         for snake_tile_positon in range(len(self.body) - 1):
             self.body[snake_tile_positon].x = self.body[snake_tile_positon + 1].x
@@ -43,7 +66,7 @@ class Snake:
 class Opponent:
     def __init__(self):
         self.x = int(random.randint(0, WINDOW) / TILE_SIZE) * TILE_SIZE
-        self.y = -100
+        self.y = int(random.randint(0, WINDOW) / TILE_SIZE) * TILE_SIZE
         self.rect = pygame.Rect(self.x, self.y, TILE_SIZE, TILE_SIZE)
 
     def draw_opponent(self):
@@ -112,11 +135,6 @@ while True:
     for tile in snake.body:
         pygame.draw.rect(screen, "green", tile)
 
-    if snake.head.y > 800 or snake.head.y < 0 or snake.head.x > 800 or snake.head.x < 0:
-        snake.dead = True
-    if snake.head.y == wall[0].y:
-        snake.dead = True
-
     # Opponent position
     for opponent in opponents:
         opponent.draw_opponent()
@@ -127,8 +145,8 @@ while True:
     for opponent in opponents:
         if snake.head.x == opponent.x and snake.head.y == opponent.y:
             opponents.remove(opponent)
-            if len(snake.body) < 5:
-                snake.body.append(pygame.Rect(snake.head.x, snake.head.y, TILE_SIZE, TILE_SIZE))
+            if len(snake.body) < 6:
+                snake.body.append(pygame.Rect(tile.x, tile.y, TILE_SIZE, TILE_SIZE))
         if wall[0].y == opponent.y:
             opponents.remove(opponent)
 
@@ -138,4 +156,4 @@ while True:
 
     total_frames_count += 4
     pygame.display.update()
-    clock.tick(15)
+    clock.tick(10)
